@@ -1,0 +1,101 @@
+/*************mongodb*****************/
+
+/**useful commands***/
+show dbs
+use dbname
+isMaster()
+secondaryOk()
+db.collectionname.find({})
+show collections
+db.dragonball.insertOne({"name": "Goku","surname": "Saiyan","type": "Hero"})
+db.spells.find({"spells.schools":{eq:Conjuration}}).count()
+db.spells.find().pretty()
+
+
+db.transactions.insertMany([
+
+    {"Name":"test","transactionDate":new Date(Date.now())},
+    {"Name":"test2","transactionDate":new Date(Date.now())}, 
+    {"Name":"test3","transactionDate":new Date(Date.now())},
+    ])
+
+
+
+/*run localhost**/
+.\mongod --port 27017 --dbpath "C:\MongoDB\data\db"
+
+/**************power shell******************/
+
+/****first server step 1 shared server****/
+
+/*folder path*/
+cd  "c:\program files\mongodb\server\5.0\bin"
+
+/****second server step 2****/
+.\mongod -f "c:\thiago_srv2\conf\node2.conf"
+
+/****third server step 3****/
+.\mongod -f "c:\thiago_srv3\conf\node3.conf"
+
+
+/*running server*/
+.\mongod -f "c:\thiago_srv1\conf\node1.conf"
+
+/*connect to a new server - inside of the new powershell prompt*/
+mongosh –-port 27010
+mongosh –-port 27011
+mongosh –-port 27012
+
+
+/*show the servers running*/
+netstat -a
+
+
+/****step 4****/
+rs.initiate()
+rs.status()
+
+rs.add("localhost:27011")
+rs.add("localhost:27012")
+
+
+
+
+/**showtdown server**/
+mongosh –-port 27010
+use admin
+db.shutdownServer()
+
+/***import files***/
+.\mongoimport --jsonArray --port 27017  --db dnd --collection spells --file c:\data\spells_2.json
+
+
+/***sort****/
+db.sales.find({ }).sort( { StoreLocation : 1 } )
+
+/***create user***/
+db.dropUser("thiago")
+db.getUser("thiago")
+db.auth("thiago", "root")
+
+db.createUser ({
+    user: "Steve",
+    pwd: "password",
+    roles: [
+        {role: "root", db: "admin"}
+    ]
+})
+
+mongosh --port 27015 -u thiago -p password --authenticationDatabase admin
+
+
+/***index creation***/
+
+db.spells.createIndex(
+{name: 1},
+{name: "spellName"}
+)
+
+db.cart.createIndex( { "CollectedAt": 1 }, { expireAfterSeconds: 30 } )
+
+db.spells.dropIndex("name of the index");
